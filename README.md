@@ -52,7 +52,7 @@ $s = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBat
 Register-ScheduledTask -TaskName SpacewalkBackend -Action $a -Trigger $t -Settings $s
 ```
 
-Manage it with `Start-ScheduledTask SpacewalkBackend`, `Stop-ScheduledTask SpacewalkBackend` (also needed after editing `config.json`) and `Unregister-ScheduledTask SpacewalkBackend`. Output goes to `logs/web.log`.
+This setup has been tested at login on Windows 11. Manage it with `Start-ScheduledTask SpacewalkBackend`, `Stop-ScheduledTask SpacewalkBackend` (also needed after editing `config.json`) and `Unregister-ScheduledTask SpacewalkBackend`. Output goes to `logs/web.log`.
 
 Notes:
 - Run it as your own user, only while logged in. Do not make it a Windows service or "run whether user is logged on or not": Windows Bluetooth LE access generally needs your desktop session.
