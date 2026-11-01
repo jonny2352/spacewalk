@@ -2,6 +2,23 @@
 
 Connects over Bluetooth LE using the standard FTMS profile, records every sample to SQLite, and controls the belt from a local web dashboard. Tested on Windows 10 with the built-in adapter, Python 3.14.
 
+**Developed and tested only on one Urevo Spacewalk 5L** (model `URTM054`, firmware V90.08.15), Windows 10, Python 3.14. Everything here was verified against that treadmill and nothing else. It moves a real belt, so use it at your own risk and keep the physical stop or remote within reach.
+
+## Other devices
+This is not Urevo-specific: it uses the standard Bluetooth Fitness Machine Service (FTMS, 0x1826), not a vendor protocol. These are educated guesses, none tested:
+
+| Likely to work | Why |
+|---|---|
+| Other Urevo walking pads and treadmills that advertise FTMS (check with `scan.py` / `dump.py`) | Same vendor, probably the same firmware family. Speed range, incline and available fields may differ. |
+| Any treadmill from another brand that exposes FTMS Treadmill Data (0x2ACD) and Control Point (0x2AD9) | The decoder follows the FTMS flags, and the speed and incline ranges are read from the device. |
+
+| Unlikely to work | Why |
+|---|---|
+| Walking pads that only speak a vendor protocol (many Kingsmith/WalkingPad models, and some other budget pads, use one) | There is no FTMS service to talk to, and this app deliberately never writes to unidentified characteristics. |
+| Bikes, rowers, ellipticals | They use different FTMS characteristics. |
+
+To check a device, run `python dump.py` (read-only) and look for `FTMS (0x1826) present: YES`. Even then, test cautiously (see `docs/protocol.md` for what was confirmed on the 5L). Pause is still untested there, and the first Start after a Stop sometimes needs a retry. Start with a low `max_speed_kmh`.
+
 ## Setup
 ```bash
 python -m venv .venv
