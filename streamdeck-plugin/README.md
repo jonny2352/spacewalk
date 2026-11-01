@@ -1,5 +1,7 @@
 # Walking Pad: Stream Deck plugin
 
+Unofficial: not affiliated with or endorsed by Elgato, UREVO or Kingsmith/WalkingPad. It controls a motorised belt, so read the safety warning in the main README first.
+
 Controls the Urevo Spacewalk through the local backend (`python web.py`). The plugin never talks Bluetooth itself; only one BLE client can connect, and that is the backend. It is a thin client: live state over WebSocket (`ws://localhost:8000/ws`), commands over HTTP.
 
 Versions used: Stream Deck SDK `@elgato/streamdeck` 3.0.4 (manifest `SDKVersion` 3), `@elgato/cli` 1.10.4, Node.js 24 (the SDK requires 24+), Stream Deck app 7.1 or newer.

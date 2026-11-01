@@ -2,7 +2,10 @@
 
 Connects over Bluetooth LE using the standard FTMS profile, records every sample to SQLite, and controls the belt from a local web dashboard.
 
-**Developed and tested only on one Urevo Spacewalk 5L** (model `URTM054`, firmware V90.08.15), Windows 10 and Windows 11, Python 3.14. The Stream Deck plugin has also been tested. Everything here was verified against that treadmill and nothing else. It moves a real belt, so use it at your own risk and keep the physical stop or remote within reach.
+**Developed and tested only on one Urevo Spacewalk 5L** (model `URTM054`, firmware V90.08.15), Windows 10 and Windows 11, Python 3.14. The Stream Deck plugin has also been tested. Everything here was verified against that treadmill and nothing else. 
+> **Safety warning.** This software controls a motorised belt and can start it, speed it up and change its incline. A bug, a dropped Bluetooth connection or a misclick can injure you or someone else. Test every new setup with nobody on the belt and the incline flat, keep the physical stop button or remote within reach, stay clear when starting, and lower `max_speed_kmh` until you trust it. Use it at your own risk; see the licence below.
+
+*Unofficial and not affiliated with, endorsed by or supported by UREVO, Kingsmith/WalkingPad or Elgato. "Urevo", "Spacewalk", "WalkingPad" and "Stream Deck" are trademarks of their respective owners and are used here only to say what the software works with.*
 
 ## Other devices
 This is not Urevo-specific: it uses the standard Bluetooth Fitness Machine Service (FTMS, 0x1826), not a vendor protocol. These are educated guesses, none tested:
@@ -79,3 +82,6 @@ Bound to 127.0.0.1 only, no auth. Requests whose `Host` or `Origin` is not local
 | `POST /api/start` `{confirmed:true}`, `/api/stop`, `/api/pause`, `/api/speed {kmh}`, `/api/incline {pct}` | Commands; rejections return HTTP 409 with `detail` |
 
 Stream Deck plugin: see `streamdeck-plugin/README.md`.
+
+## Licence
+MIT, see [LICENSE](LICENSE). Provided as is, with no warranty.
