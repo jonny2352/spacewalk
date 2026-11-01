@@ -69,7 +69,7 @@ Speed is capped and ramped in 0.1 km/h steps. Starting the belt always needs an 
 `python -m pytest`. See `docs/protocol.md` for confirmed commands and quirks.
 
 ## Backend API (used by the web dashboard and the Stream Deck plugin)
-Bound to 127.0.0.1 only, no auth. Port from `config.json` (`port`, default 8000).
+Bound to 127.0.0.1 only, no auth. Requests whose `Host` or `Origin` is not localhost are rejected (403 / WebSocket close), which blocks other web pages in your browser and DNS-rebinding attacks from controlling the belt; clients that send no `Origin`, like the Stream Deck plugin and curl, are unaffected. Port from `config.json` (`port`, default 8000).
 
 | Endpoint | Purpose |
 |---|---|

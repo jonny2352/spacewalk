@@ -110,3 +110,41 @@ def test_today_totals(tmp_path):
     st.add_sample(old, now - 3 * 86400 + 5, {"distance_m": 999}, b"\x00")
     st.end_session(old, now - 3 * 86400 + 10)
     assert st.today() == {"distance_m": 400, "seconds": 500, "kcal": 20}
+
+
+# --- localhost guard -------------------------------------------------------------------------
+def _call(kind, headers):
+    import asyncio
+    import security
+
+    sent, reached = [], []
+
+    async def inner(scope, receive, send):
+        reached.append(True)
+
+    async def receive():
+        return {"type": "websocket.connect"}
+
+    async def send(m):
+        sent.append(m)
+
+    scope = {"type": kind, "headers": [(k.encode(), v.encode()) for k, v in headers.items()]}
+    asyncio.run(security.LocalOnly(inner)(scope, receive, send))
+    return bool(reached), sent
+
+
+def test_local_requests_pass():
+    for h in ({"host": "127.0.0.1:8000"}, {"host": "localhost:8000", "origin": "http://localhost:8000"},
+              {"host": "[::1]:8000"}, {"host": "127.0.0.1:8000", "origin": "http://127.0.0.1:8000"}):
+        assert _call("http", h)[0] and _call("websocket", h)[0], h
+
+
+def test_foreign_host_or_origin_rejected():
+    for h in ({"host": "evil.example:8000"},                                   # DNS rebinding
+              {"host": "127.0.0.1:8000", "origin": "https://evil.example"},    # cross-site page
+              {"host": "127.0.0.1:8000", "origin": "http://127.0.0.1.evil.example"},
+              {}):                                                              # no Host at all
+        reached, sent = _call("http", h)
+        assert not reached and sent[0]["status"] == 403, h
+        reached, sent = _call("websocket", h)
+        assert not reached and sent[0]["type"] == "websocket.close", h
