@@ -53,7 +53,7 @@ Manage it with `Start-ScheduledTask SpacewalkBackend`, `Stop-ScheduledTask Space
 
 Notes:
 - Run it as your own user, only while logged in. Do not make it a Windows service or "run whether user is logged on or not": Windows Bluetooth LE access generally needs your desktop session.
-- Only one BLE client can connect, so keep the Urevo phone app closed, and do not run `recorder.py` or `controller.py` while the backend is running.
+- Only one BLE client can connect, so keep the Urevo phone app closed, and do not run `recorder.py` or `controller.py` while the backend is running. The same goes for a `web.py` you started by hand: close it before starting the task, or the two will fight over port 8000 and the Bluetooth connection.
 - The treadmill does not need to be on at login. The backend keeps retrying the connection, and the plugin shows keys as offline until it connects.
 - Starting the backend never moves the belt. A start still needs an explicit confirmation from the dashboard, or the plugin's armed Start key, after each connect.
 - It listens on `127.0.0.1` only, so nothing else on your network can reach it.
