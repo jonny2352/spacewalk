@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+<head lang="en">
+<title>Live stat</title>
+<meta charset="utf-8" />
+<script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+</head>
+<body>
+<sdpi-item label="Metric"><sdpi-select setting="metric" default="speed"><option value="speed">Current speed</option><option value="distance">Distance</option><option value="time">Elapsed time</option><option value="calories">Calories</option><option value="steps">Steps (if available)</option><option value="avg_speed">Session average speed</option><option value="connection">Connection status</option></sdpi-select></sdpi-item>
+<sdpi-item label="Backend URL">
+<sdpi-textfield setting="backendUrl" global placeholder="http://localhost:8000" default="http://localhost:8000"></sdpi-textfield>
+</sdpi-item>
+</body>
+</html>

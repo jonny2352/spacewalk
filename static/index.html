@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spacewalk</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --fg:#1b1f24; --mut:#6b7380; --line:#e2e5ea; --acc:#1f7a5c; --red:#c8281e; --amb:#b7791f; --blue:#2b6fdc; --th:22px; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14171b; --card:#1d2126; --fg:#e8eaed; --mut:#8b94a1; --line:#2c3238; --acc:#3fb68b; --red:#e5483d; --amb:#e0a13a; --blue:#5b9cff; } }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px system-ui,sans-serif; background:var(--bg); color:var(--fg); }
+  main { max-width:900px; margin:0 auto; padding:16px; display:grid; gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  header { display:flex; justify-content:space-between; align-items:center; }
+  h1 { font-size:20px; margin:0; } h2 { font-size:15px; margin:0 0 10px; color:var(--mut); font-weight:600; }
+  #conn { font-size:14px; } #conn::before { content:""; display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--red); margin-right:6px; }
+  #conn.ok::before { background:var(--acc); }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; }
+  .stat b { display:block; font-size:34px; font-variant-numeric:tabular-nums; } .stat span { color:var(--mut); font-size:13px; }
+  canvas { width:100%; height:180px; display:block; }
+  .btns { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+  button { font:inherit; border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:10px; padding:14px; cursor:pointer; }
+  button.big { font-size:22px; font-weight:600; padding:22px; }
+  #bStart { background:var(--acc); color:#fff; border:0; } #bPause { background:var(--amb); color:#fff; border:0; }
+  #bStop { background:var(--red); color:#fff; border:0; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  .row { display:flex; align-items:center; gap:12px; margin-top:14px; } .row input[type=range] { flex:1; }
+  .row .val { min-width:90px; text-align:right; font-variant-numeric:tabular-nums; }
+  .speedwrap { position:relative; flex:1; height:56px; }
+  .speedwrap .rail, .speedwrap .fill { position:absolute; top:14px; height:8px; border-radius:4px; left:calc(var(--th)/2); }
+  .speedwrap .rail { right:calc(var(--th)/2); background:var(--line); }
+  .speedwrap .fill { background:var(--blue); width:0; transition:width 1s linear; }
+  .speedwrap .tick { position:absolute; top:26px; width:1px; height:6px; background:var(--mut); transform:translateX(-.5px); }
+  .speedwrap .tick.w { height:10px; }
+  .speedwrap .lbl { position:absolute; top:38px; font-size:11px; color:var(--mut); transform:translateX(-50%); }
+  .speedwrap input { position:absolute; inset:0 0 auto 0; width:100%; height:36px; margin:0; background:none; -webkit-appearance:none; appearance:none; }
+  .speedwrap input::-webkit-slider-runnable-track { background:none; height:36px; }
+  .speedwrap input::-moz-range-track { background:none; height:36px; }
+  .speedwrap input::-webkit-slider-thumb { -webkit-appearance:none; width:var(--th); height:var(--th); margin-top:7px; border-radius:50%; background:var(--card); border:3px solid var(--blue); box-shadow:0 1px 4px rgba(0,0,0,.3); cursor:pointer; }
+  .speedwrap input::-moz-range-thumb { width:calc(var(--th) - 6px); height:calc(var(--th) - 6px); border-radius:50%; background:var(--card); border:3px solid var(--blue); cursor:pointer; }
+  .speedwrap input:disabled::-webkit-slider-thumb { border-color:var(--mut); cursor:not-allowed; }
+  table { width:100%; border-collapse:collapse; font-size:14px; } td,th { padding:8px 6px; border-bottom:1px solid var(--line); text-align:left; }
+  tr.s { cursor:pointer; } tr.s:hover { background:var(--bg); }
+  a { color:var(--acc); } #log { font:12px ui-monospace,monospace; color:var(--mut); white-space:pre-wrap; margin:0; }
+  dialog { border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--fg); max-width:420px; }
+  dialog::backdrop { background:rgba(0,0,0,.5); } dialog .btns { grid-template-columns:1fr 1fr; margin-top:16px; }
+</style>
+</head>
+<body>
+<main>
+  <header><h1>Spacewalk</h1><div id="conn">connecting…</div></header>
+
+  <section class="card">
+    <div class="stats">
+      <div class="stat"><b id="speed">–</b><span>km/h</span></div>
+      <div class="stat"><b id="dist">–</b><span>distance (m)</span></div>
+      <div class="stat"><b id="time">–</b><span>time</span></div>
+      <div class="stat"><b id="kcal">–</b><span>kcal</span></div>
+      <div class="stat"><b id="inc">–</b><span>incline %</span></div>
+    </div>
+  </section>
+
+  <section class="card"><h2>Live speed</h2><canvas id="live"></canvas></section>
+
+  <section class="card">
+    <div class="btns">
+      <button class="big" id="bStart">Start</button>
+      <button class="big" id="bPause">Pause</button>
+      <button class="big" id="bStop">STOP</button>
+    </div>
+    <div class="row"><button id="sMinus">−</button>
+      <div class="speedwrap" id="speedwrap"><div class="rail"></div><div class="fill" id="fill"></div>
+        <input type="range" id="speedSlider" min="1" max="3" step="0.1" value="1" aria-label="Target speed"></div>
+      <button id="sPlus">+</button><span class="val"><b id="speedTarget">–</b> km/h</span></div>
+    <div class="row"><span>Incline</span>
+      <input type="range" id="incSlider" min="0" max="9" step="1" value="0">
+      <span class="val"><b id="incTarget">0</b> %</span></div>
+    <p style="color:var(--mut);font-size:13px;margin:12px 0 0">Space or Esc = emergency stop. Speed is capped at <span id="cap">–</span> km/h and ramps in small steps.</p>
+  </section>
+
+  <section class="card"><h2>Sessions</h2>
+    <table><thead><tr><th>#</th><th>Started</th><th>Duration</th><th>Distance</th><th></th></tr></thead><tbody id="sessions"></tbody></table>
+  </section>
+
+  <section class="card" id="detail" hidden><h2 id="detailTitle">Session</h2><canvas id="dchart"></canvas></section>
+
+  <section class="card"><h2>Log</h2><pre id="log"></pre></section>
+</main>
+
+<dialog id="dlg">
+  <b>The belt will start moving.</b>
+  <p>Stand clear of the belt and keep the physical stop button or remote within reach.</p>
+  <div class="btns"><button id="dNo">Cancel</button><button id="dYes" class="big" style="background:var(--acc);color:#fff;border:0;padding:12px">Start belt</button></div>
+</dialog>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmtT = s => s == null ? "–" : `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+const post = (url, body) => fetch(url, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body||{})})
+  .then(r => r.ok ? r.json() : r.json().then(e => { throw new Error(e.detail); })).catch(e => alert(e.message));
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function chart(canvas, pts, label) {
+  const dpr = devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight;
+  canvas.width = w*dpr; canvas.height = h*dpr;
+  const c = canvas.getContext("2d"); c.scale(dpr, dpr); c.clearRect(0,0,w,h);
+  const pad = {l:34, r:8, t:8, b:18};
+  if (pts.length < 2) { c.fillStyle = css("--mut"); c.fillText("waiting for data…", pad.l, h/2); return; }
+  const t0 = pts[0][0], t1 = pts[pts.length-1][0], ymax = Math.max(3, ...pts.map(p => p[1])) * 1.1;
+  const X = t => pad.l + (t-t0)/(t1-t0||1)*(w-pad.l-pad.r), Y = v => h-pad.b - v/ymax*(h-pad.t-pad.b);
+  c.strokeStyle = css("--line"); c.fillStyle = css("--mut"); c.font = "11px system-ui"; c.lineWidth = 1;
+  for (let i = 0; i <= 3; i++) { const v = ymax*i/3, y = Y(v); c.beginPath(); c.moveTo(pad.l,y); c.lineTo(w-pad.r,y); c.stroke(); c.fillText(v.toFixed(1), 2, y+4); }
+  c.fillText(fmtT(Math.round(t1-t0)), w-40, h-4);
+  c.strokeStyle = css("--acc"); c.lineWidth = 2; c.beginPath();
+  pts.forEach((p,i) => i ? c.lineTo(X(p[0]),Y(p[1])) : c.moveTo(X(p[0]),Y(p[1]))); c.stroke();
+}
+
+// Position along the track for a speed, matching where the thumb centre sits.
+const pos = (v, lo, hi) => `calc(var(--th)/2 + (100% - var(--th)) * ${Math.min(1, Math.max(0, (v-lo)/((hi-lo)||1)))})`;
+let tickKey = "";
+function drawTicks(lo, hi) {
+  if (tickKey === lo + "-" + hi) return; tickKey = lo + "-" + hi;
+  const wrap = $("speedwrap"); wrap.querySelectorAll(".tick,.lbl").forEach(n => n.remove());
+  for (let v = Math.ceil(lo*2)/2; v <= hi + 1e-9; v += 0.5) {
+    const whole = Math.abs(v - Math.round(v)) < 1e-9;
+    const t = document.createElement("div"); t.className = "tick" + (whole ? " w" : ""); t.style.left = pos(v, lo, hi); wrap.append(t);
+    if (whole) { const l = document.createElement("div"); l.className = "lbl"; l.textContent = v; l.style.left = pos(v, lo, hi); wrap.append(l); }
+  }
+}
+let pts = [], cap = 3, sliderBusy = false, timer;
+function render(s) {
+  $("conn").textContent = s.connected ? "connected" + (s.status ? " · " + s.status : "") : "disconnected";
+  $("conn").className = s.connected ? "ok" : "";
+  const l = s.live || {};
+  $("speed").textContent = l.speed_kmh?.toFixed(1) ?? "–";
+  $("dist").textContent = l.distance_m ?? "–";
+  $("time").textContent = fmtT(l.elapsed_s);
+  $("kcal").textContent = l.energy_kcal ?? "–";
+  $("inc").textContent = l.incline_pct?.toFixed(1) ?? "–";
+  cap = s.cap; $("cap").textContent = cap;
+  const sl = $("speedSlider"); sl.min = s.speed_min; sl.max = cap; sl.step = s.speed_step;
+  $("incSlider").max = s.incline_max; $("incSlider").disabled = !s.incline_max;
+  drawTicks(s.speed_min, cap);
+  $("fill").style.width = l.speed_kmh > 0 ? `calc((100% - var(--th)) * ${Math.min(1, Math.max(0, (l.speed_kmh - s.speed_min)/((cap - s.speed_min)||1)))})` : "0";
+  if (!sliderBusy) { sl.value = s.target_kmh || l.speed_kmh || s.speed_min; $("speedTarget").textContent = (+sl.value).toFixed(1); }
+  for (const id of ["bStart","bPause","sMinus","sPlus","speedSlider"]) $(id).disabled = !s.connected;
+  $("bStop").disabled = !s.connected;
+  $("log").textContent = (s.log || []).join("\n");
+  if (l.ts && (!pts.length || pts[pts.length-1][0] !== l.ts)) { pts.push([l.ts, l.speed_kmh || 0]); pts = pts.slice(-300); chart($("live"), pts); }
+}
+
+function setSpeed(v) {
+  v = Math.min(cap, Math.max(+$("speedSlider").min, v)); $("speedSlider").value = v; $("speedTarget").textContent = v.toFixed(1);
+  sliderBusy = true; clearTimeout(timer);
+  timer = setTimeout(() => { sliderBusy = false; post("/api/speed", {kmh: v}); }, 350);
+}
+$("speedSlider").oninput = e => setSpeed(+e.target.value);
+$("sMinus").onclick = () => setSpeed(+$("speedSlider").value - 0.1);
+$("sPlus").onclick = () => setSpeed(+$("speedSlider").value + 0.1);
+$("incSlider").onchange = e => { $("incTarget").textContent = e.target.value; post("/api/incline", {pct: +e.target.value}); };
+$("bStart").onclick = () => $("dlg").showModal();
+$("dNo").onclick = () => $("dlg").close();
+$("dYes").onclick = () => { $("dlg").close(); post("/api/start", {confirmed: true}); };
+$("bPause").onclick = () => post("/api/pause");
+const stop = () => post("/api/stop");
+$("bStop").onclick = stop;
+addEventListener("keydown", e => { if ((e.code === "Space" || e.key === "Escape") && !$("dlg").open) { e.preventDefault(); stop(); } });
+
+async function loadSessions() {
+  const rows = await (await fetch("/api/sessions")).json();
+  $("sessions").innerHTML = rows.map(r => `<tr class="s" data-id="${r.id}"><td>${r.id}</td>
+    <td>${new Date(r.started_at*1000).toLocaleString()}</td><td>${r.ended_at ? fmtT(Math.round(r.ended_at - r.started_at)) : "live"}</td>
+    <td>${r.distance_m ?? 0} m</td><td><a href="/api/sessions/${r.id}.csv">CSV</a></td></tr>`).join("");
+  document.querySelectorAll("tr.s").forEach(tr => tr.onclick = e => { if (e.target.tagName !== "A") showSession(tr.dataset.id); });
+}
+async function showSession(id) {
+  const d = await (await fetch("/api/sessions/" + id)).json();
+  $("detail").hidden = false; $("detailTitle").textContent = `Session ${id}: speed (km/h), ${d.samples.length} samples`;
+  chart($("dchart"), d.samples.map(s => [s.ts, s.speed_kmh || 0]));
+  $("detail").scrollIntoView({behavior:"smooth"});
+}
+
+function connect() {
+  const ws = new WebSocket(`ws://${location.host}/ws`);
+  ws.onmessage = e => render(JSON.parse(e.data));
+  ws.onclose = () => { $("conn").textContent = "server offline"; $("conn").className = ""; setTimeout(connect, 2000); };
+}
+connect(); loadSessions(); setInterval(loadSessions, 15000);
+</script>
+</body>
+</html>

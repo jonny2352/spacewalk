@@ -1,0 +1,48 @@
+{
+  "id": "com.jonny2352.walkingpad.layout",
+  "items": [
+    {
+      "key": "speed",
+      "type": "text",
+      "rect": [
+        8,
+        6,
+        184,
+        56
+      ],
+      "font": {
+        "size": 40,
+        "weight": 700
+      },
+      "alignment": "center"
+    },
+    {
+      "key": "time",
+      "type": "text",
+      "rect": [
+        8,
+        66,
+        90,
+        28
+      ],
+      "font": {
+        "size": 22
+      },
+      "alignment": "left"
+    },
+    {
+      "key": "distance",
+      "type": "text",
+      "rect": [
+        102,
+        66,
+        90,
+        28
+      ],
+      "font": {
+        "size": 22
+      },
+      "alignment": "right"
+    }
+  ]
+}

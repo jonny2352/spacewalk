@@ -1,0 +1,237 @@
+{
+  "Name": "Walking Pad",
+  "Version": "0.1.0.0",
+  "Author": "jonny2352",
+  "Actions": [
+    {
+      "Name": "Start / Resume",
+      "UUID": "com.jonny2352.walkingpad.start",
+      "Icon": "imgs/actions/start/icon",
+      "Tooltip": "Start or resume the belt. First press arms the key, second press starts (configurable).",
+      "PropertyInspectorPath": "ui/start.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/start/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Stop (Emergency)",
+      "UUID": "com.jonny2352.walkingpad.stop",
+      "Icon": "imgs/actions/stop/icon",
+      "Tooltip": "Stops the belt immediately, no confirmation.",
+      "PropertyInspectorPath": "ui/backend.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/stop/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Pause",
+      "UUID": "com.jonny2352.walkingpad.pause",
+      "Icon": "imgs/actions/pause/icon",
+      "Tooltip": "Pauses the belt.",
+      "PropertyInspectorPath": "ui/backend.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/pause/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Speed Up",
+      "UUID": "com.jonny2352.walkingpad.speed-up",
+      "Icon": "imgs/actions/speed-up/icon",
+      "Tooltip": "Increase speed by a step, within the cap.",
+      "PropertyInspectorPath": "ui/step.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/speed-up/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Speed Down",
+      "UUID": "com.jonny2352.walkingpad.speed-down",
+      "Icon": "imgs/actions/speed-down/icon",
+      "Tooltip": "Decrease speed by a step.",
+      "PropertyInspectorPath": "ui/step.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/speed-down/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Set Speed Preset",
+      "UUID": "com.jonny2352.walkingpad.preset",
+      "Icon": "imgs/actions/preset/icon",
+      "Tooltip": "Ramp to a fixed speed.",
+      "PropertyInspectorPath": "ui/preset.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/preset/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Incline Up",
+      "UUID": "com.jonny2352.walkingpad.incline-up",
+      "Icon": "imgs/actions/incline-up/icon",
+      "Tooltip": "Increase incline (if supported).",
+      "PropertyInspectorPath": "ui/incline.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/incline-up/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Incline Down",
+      "UUID": "com.jonny2352.walkingpad.incline-down",
+      "Icon": "imgs/actions/incline-down/icon",
+      "Tooltip": "Decrease incline (if supported).",
+      "PropertyInspectorPath": "ui/incline.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/incline-down/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Live Stat",
+      "UUID": "com.jonny2352.walkingpad.stat",
+      "Icon": "imgs/actions/stat/icon",
+      "Tooltip": "Shows one live metric.",
+      "PropertyInspectorPath": "ui/stat.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/stat/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Today's Totals",
+      "UUID": "com.jonny2352.walkingpad.today",
+      "Icon": "imgs/actions/today/icon",
+      "Tooltip": "Today's distance, time and calories.",
+      "PropertyInspectorPath": "ui/backend.html",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/actions/today/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ],
+      "UserTitleEnabled": false
+    },
+    {
+      "Name": "Speed Dial (Stream Deck +)",
+      "UUID": "com.jonny2352.walkingpad.dial",
+      "Icon": "imgs/actions/dial/icon",
+      "Tooltip": "Rotate to change speed, press to stop.",
+      "PropertyInspectorPath": "ui/dial.html",
+      "Controllers": [
+        "Encoder"
+      ],
+      "UserTitleEnabled": false,
+      "Encoder": {
+        "layout": "layouts/walkingpad.json",
+        "TriggerDescription": {
+          "Rotate": "Change speed",
+          "Push": "Stop belt"
+        },
+        "Icon": "imgs/actions/dial/key"
+      },
+      "States": [
+        {
+          "Image": "imgs/actions/dial/key",
+          "TitleAlignment": "middle",
+          "ShowTitle": false
+        }
+      ]
+    }
+  ],
+  "Category": "Walking Pad",
+  "CategoryIcon": "imgs/plugin/category-icon",
+  "CodePath": "bin/plugin.js",
+  "Description": "Control and monitor the Urevo Spacewalk walking pad through the local Spacewalk backend.",
+  "Icon": "imgs/plugin/marketplace",
+  "SDKVersion": 3,
+  "Software": {
+    "MinimumVersion": "7.1"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    },
+    {
+      "Platform": "mac",
+      "MinimumVersion": "12"
+    }
+  ],
+  "Nodejs": {
+    "Version": "24",
+    "Debug": "enabled"
+  },
+  "UUID": "com.jonny2352.walkingpad"
+}
