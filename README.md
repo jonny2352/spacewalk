@@ -1,8 +1,8 @@
 # Spacewalk: local BLE app for the Urevo Spacewalk 5L (URTM054)
 
-Connects over Bluetooth LE using the standard FTMS profile, records every sample to SQLite, and controls the belt from a local web dashboard. Tested on Windows 10 with the built-in adapter, Python 3.14.
+Connects over Bluetooth LE using the standard FTMS profile, records every sample to SQLite, and controls the belt from a local web dashboard.
 
-**Developed and tested only on one Urevo Spacewalk 5L** (model `URTM054`, firmware V90.08.15), Windows 10, Python 3.14. Everything here was verified against that treadmill and nothing else. It moves a real belt, so use it at your own risk and keep the physical stop or remote within reach.
+**Developed and tested only on one Urevo Spacewalk 5L** (model `URTM054`, firmware V90.08.15), Windows 10 and Windows 11, Python 3.14. The Stream Deck plugin has also been tested. Everything here was verified against that treadmill and nothing else. It moves a real belt, so use it at your own risk and keep the physical stop or remote within reach.
 
 ## Other devices
 This is not Urevo-specific: it uses the standard Bluetooth Fitness Machine Service (FTMS, 0x1826), not a vendor protocol. These are educated guesses, none tested:
