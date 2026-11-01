@@ -20,7 +20,7 @@ This is not Urevo-specific: it uses the standard Bluetooth Fitness Machine Servi
 | Walking pads that only speak a vendor protocol (many Kingsmith/WalkingPad models, and some other budget pads, use one) | There is no FTMS service to talk to, and this app deliberately never writes to unidentified characteristics. |
 | Bikes, rowers, ellipticals | They use different FTMS characteristics. |
 
-To check a device, run `python dump.py` (read-only) and look for `FTMS (0x1826) present: YES`. Even then, test cautiously (see `docs/protocol.md` for what was confirmed on the 5L). Pause is still untested there, and the first Start after a Stop sometimes needs a retry. Start with a low `max_speed_kmh`.
+To check a device, run `python dump.py` (read-only) and look for `FTMS (0x1826) present: YES`. Even then, test cautiously (see `docs/protocol.md` for what was confirmed on the 5L). On the 5L the first Start after a Stop sometimes needs a retry, which the controller does automatically; other devices may behave differently. Start with a low `max_speed_kmh`.
 
 ## Setup
 ```bash
