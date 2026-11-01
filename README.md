@@ -39,6 +39,26 @@ Power the treadmill on and fully close the Urevo phone app first: it accepts one
 
 Only one of recorder, controller and web can run at a time. The dashboard does both recording and control.
 
+## Run at startup (for the Stream Deck plugin)
+The plugin only talks to the backend, so `web.py` must be running whenever you want the keys to work. On Windows the simplest reliable way is a Task Scheduler task that starts it, hidden, when you log in. Run once in PowerShell from the project folder:
+
+```powershell
+$a = New-ScheduledTaskAction -Execute powershell.exe -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$PWD\scripts\start-web.ps1`""
+$t = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+$s = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+Register-ScheduledTask -TaskName SpacewalkBackend -Action $a -Trigger $t -Settings $s
+```
+
+Manage it with `Start-ScheduledTask SpacewalkBackend`, `Stop-ScheduledTask SpacewalkBackend` (also needed after editing `config.json`) and `Unregister-ScheduledTask SpacewalkBackend`. Output goes to `logs/web.log`.
+
+Notes:
+- Run it as your own user, only while logged in. Do not make it a Windows service or "run whether user is logged on or not": Windows Bluetooth LE access generally needs your desktop session.
+- Only one BLE client can connect, so keep the Urevo phone app closed, and do not run `recorder.py` or `controller.py` while the backend is running.
+- The treadmill does not need to be on at login. The backend keeps retrying the connection, and the plugin shows keys as offline until it connects.
+- Starting the backend never moves the belt. A start still needs an explicit confirmation from the dashboard, or the plugin's armed Start key, after each connect.
+- It listens on `127.0.0.1` only, so nothing else on your network can reach it.
+- Check it is up with http://127.0.0.1:8000, or look in `logs/web.log` if it is not.
+
 ## Config (`config.json`)
 `max_speed_kmh` (speed cap; default 6.0, the pad's maximum; lower it to be safer), `idle_timeout_s` (60, ends a session), `speed_step_kmh` (0.1 ramp step), `db_path`.
 
